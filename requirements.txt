@@ -1,3 +1,4 @@
 agent-framework==1.25.0
 python-dotenv==1.2.4
 azure-identity==1.27.0
+foundry-local-sdk==2.4.0

@@ -4,6 +4,8 @@
 
 Welcome to **Mastering Microsoft Agent Framework in Python**, a hands-on, lab-driven course that teaches you how to build production-ready AI agents with [Microsoft Agent Framework](https://learn.microsoft.com/agent-framework/) (MAF).
 
+This repo is intended to accompany the full online video course with full demonstrations on the [Training Boss website](https://thetrainingboss.com/course/microsoft-agent-framework-fundamentals-in-python/) 
+
 Every lab is a small, self-contained Python script that you can read in a few minutes and run on its own. The labs build on each other: you start by connecting to a model, then add streaming, chat loops, tools, MCP servers, middleware, and multi-agent patterns.
 
 > 📚 **This course keeps growing.** New labs are added regularly. Watch or star the repository so you get notified when new labs are published.

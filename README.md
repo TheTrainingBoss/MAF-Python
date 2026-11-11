@@ -2,13 +2,11 @@
 
 # Mastering Microsoft Agent Framework in Python
 
-Welcome to **Mastering Microsoft Agent Framework in Python**, a hands-on, lab-driven course that teaches you how to build production-ready AI agents with [Microsoft Agent Framework](https://learn.microsoft.com/agent-framework/) (MAF).
+Welcome to **Mastering Microsoft Agent Framework in Python**, a hands-on course exploring how to build AI agents with [Microsoft Agent Framework](https://learn.microsoft.com/agent-framework/) (MAF).
 
 This repo is intended to accompany the full online video course with full demonstrations on the [Training Boss website](https://thetrainingboss.com/course/microsoft-agent-framework-fundamentals-in-python/) 
 
-The labs build on each other: you start by connecting to a model, then add streaming, tools, RAG, multimodal content, persistent history, AG-UI, observability, and workflows. Most are standalone Python scripts; the AG-UI client and server labs are designed to run together.
-
-> 📚 **This course keeps growing.** New labs are added regularly. Watch or star the repository so you get notified when new labs are published.
+The 45 labs build on each other: you start by connecting to a model, then add tools, RAG, multimodal content, persistent history, AG-UI, observability, workflows, and agent skills. Most are standalone Python scripts; the AG-UI client and server labs are designed to run together.
 
 ---
 
@@ -36,7 +34,9 @@ By the end of the course you will be able to:
 - **Trace agent runs** with OpenTelemetry, console output, and optional Azure Application Insights export.
 - **Build workflows** with custom executors, sequential and concurrent agents, handoffs, and round-robin group chat.
 - **Pause and resume workflows for human input** in an interactive animal-guessing game.
-- In upcoming labs, you'll also work with additional workflow and multi-agent patterns, evaluation, and deployment. See [Roadmap](#roadmap).
+- **Load agent skills** and handle skill-tool approval requests.
+- **Use GitHub Copilot** as an agent and explore Azure OpenAI model routing.
+- **Generate images and video with Google models** and save the results locally.
 
 ---
 
@@ -84,13 +84,17 @@ By the end of the course you will be able to:
 | 38 | [38-HandoffWorkflowDemo.py](./src/38-HandoffWorkflowDemo.py) | Supervisor hands questions to movie or music specialists | Azure OpenAI (`gpt-5`, `gpt-5-mini`) |
 | 39 | [39-GroupChatWorkflowDemo.py](./src/39-GroupChatWorkflowDemo.py) | Movie and music agents take turns in a round-robin group chat | Azure OpenAI (`gpt-5`) |
 | 40 | [40-HumanInTheLoopWorkflowDemo.py](./src/40-HumanInTheLoopWorkflowDemo.py) | Pause and resume an animal-guessing workflow for user input | Azure OpenAI (`gpt-5`) |
-| 41+ | *Coming soon* | See [Roadmap](#roadmap) | |
+| 41 | [41-AgentSkillsDemo.py](./src/41-AgentSkillsDemo.py) | Load local skills with `SkillsProvider` and approve skill-tool requests | Azure OpenAI (`gpt-5`) + local skills |
+| 42 | [42-GitHubCopilotDemo.py](./src/42-GitHubCopilotDemo.py) | Run a GitHub Copilot agent with a weather tool and usage reporting | GitHub Copilot access + Copilot CLI |
+| 43 | [43-ModelRouterDemo.py](./src/43-ModelRouterDemo.py) | Use Azure OpenAI model routing and report the selected model | Azure OpenAI `model-router` deployment |
+| 44 | [44-NanoBananaDemo.py](./src/44-NanoBananaDemo.py) | Generate and save images with a Gemini image model | Google API key + `gemini-3.1-flash-image` access |
+| 45 | [45-GoogleVideoDemo.py](./src/45-GoogleVideoDemo.py) | Request and save video from the Google Interactions API | Google API key + `gemini-omni-1.2-flash` access |
 
 ---
 
 ## Prerequisites
 
-- **Python 3.10 or later.** Python 3.12+ is recommended.
+- **Python 3.11 or later.** Python 3.12+ is recommended.
 - **Git.**
 - **An editor.** [Visual Studio Code](https://code.visualstudio.com/) with the Python extension is recommended.
 - **At least one model provider.** You don't need every provider. Most labs from 10 onward use **Azure OpenAI**, so that's the best one to set up first.
@@ -105,9 +109,13 @@ By the end of the course you will be able to:
 - **For the Azure image generation lab (26):** an image generation model deployment (for example `gpt-image-2.5-flare`) in Azure OpenAI.
 - **For labs 29 and 30:** an Azure Cosmos DB for NoSQL account. Lab 30 also needs a database and a vector-enabled container.
 - **For lab 34 (optional):** an Application Insights resource and its connection string for Azure Monitor export.
+- **For lab 42:** the GitHub Copilot CLI, an authenticated account with Copilot access, and access to the configured model.
+- **For labs 43–45:** access to the model router deployment or Google models named in the scripts. Availability can vary by account and region.
 - **For the local labs (optional):**
   - [Ollama](https://ollama.com/download) with a pulled model (`ollama pull gemma4`)
   - [Foundry Local](https://learn.microsoft.com/azure/ai-foundry/foundry-local/)
+
+Cloud model calls and Azure resources may incur charges, including image and video generation. Check provider pricing and clean up resources you no longer need.
 
 ---
 
@@ -145,7 +153,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-The requirements include the Foundry Local SDK and the packages used by the Cosmos DB, AG-UI, DevUI, and OpenTelemetry labs.
+The requirements include the Foundry Local SDK and the packages used by the Cosmos DB, AG-UI, DevUI, OpenTelemetry, GitHub Copilot, and Gemini labs.
 
 ### 4. Configure your environment variables
 
@@ -163,15 +171,17 @@ cp .env.example .env
 
 | Variable | Used by |
 |----------|---------|
-| `OPENAI_API_KEY`, `OPENAI_MODEL` | Labs 01, 25, 27 |
-| `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` | Labs 02, 10–24, 26, 28–31, 33, 34, 36–40 |
+| `OPENAI_API_KEY` | Labs 01, 25, 27 |
+| `OPENAI_MODEL` | Lab 01 |
+| `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` | Labs 02, 10–24, 26, 28–31, 33, 34, 36–41, 43 |
 | `AZURE_OPENAI_MODEL` | Lab 02 and other labs that read the model from the environment |
 | `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_API_KEY`, `AZURE_SEARCH_INDEX_NAME` | Labs 21, 22 |
 | `COSMOS_ENDPOINT`, `COSMOS_API_KEY` | Labs 29, 30 |
 | `COSMOS_DATABASE_NAME`, `COSMOS_CACHE_CONTAINER_NAME` | Lab 30 |
 | `APPLICATION_INSIGHTS_INSTRUMENTATION_KEY` | Lab 34: full Application Insights **connection string**, or empty for console-only tracing |
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Lab 03 |
-| `GOOGLE_API_KEY`, `GOOGLE_MODEL` | Lab 04 |
+| `GOOGLE_API_KEY` | Labs 04, 44, 45 |
+| `GOOGLE_MODEL` | Lab 04 |
 | `GROK4_API_KEY`, `GROK4_MODEL`, `GROK4_BASE_URL` | Lab 05 |
 | `MISTRAL_API_KEY`, `MISTRAL_MODEL` | Lab 06 |
 | `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_MODEL` | Lab 07 |
@@ -184,7 +194,9 @@ Lab 20 has placeholders for the Azure AI Search endpoint, key, and index name. R
 
 Add `COSMOS_CACHE_CONTAINER_NAME` to `.env` for lab 30. Lab 29 uses the hard-coded database `ttbcosmosdb` and container `chathistory-python`, rather than the database and container variables in `.env.example`. For lab 30, configure the existing container for vector search on `embedding` with partition key `/pk`.
 
-For lab 34, add `APPLICATION_INSIGHTS_INSTRUMENTATION_KEY` to `.env`. Despite its name, its value must be the full Application Insights connection string, not just an instrumentation key. Set it to an empty value for console-only tracing; leaving it unset causes the current script to fail.
+For lab 34, `APPLICATION_INSIGHTS_INSTRUMENTATION_KEY` must contain the full Application Insights connection string, not just an instrumentation key. Leave it empty for console-only tracing; leaving it unset causes the current script to fail.
+
+Lab 42 uses the logged-in Copilot user by default; `GITHUB_TOKEN` in `.env.example` is only used if you uncomment the token-based client configuration. Lab 43 uses a deployment named `model-router`; change the name in the script if yours differs. Labs 44 and 45 use model names in the scripts, not `GOOGLE_MODEL`.
 
 For lab 07 (Microsoft Foundry), sign in to Azure so `AzureCliCredential` can get a token:
 
@@ -215,6 +227,18 @@ Lab 31 listens on `localhost:5000` and declares a single-user scope; this does n
 
 Lab 34 enables sensitive telemetry, which can include prompts and responses. Use only non-sensitive test data and protect any exported traces.
 
+Lab 41 looks for `AgentSkills` in the current working directory. Run it from `src`, then return to the repository root:
+
+```bash
+cd src
+python 41-AgentSkillsDemo.py
+cd ..
+```
+
+Labs 41 and 42 automatically approve their respective skill-tool or Copilot permission requests. They are demonstrations, not approval policies for shared or production environments.
+
+Labs 44 and 45 save generated media under `src/media`. Both use fixed output filenames and can overwrite previous outputs with the same names.
+
 ---
 
 ## Repository structure
@@ -222,8 +246,9 @@ Lab 34 enables sensitive telemetry, which can include prompts and responses. Use
 ```text
 MAF-Python/
 ├── src/
-│   ├── 01-OpenAIDemo.py … 40-HumanInTheLoopWorkflowDemo.py  # Labs, numbered in learning order
-│   └── media/                                      # Lab media and generated images
+│   ├── 01-OpenAIDemo.py … 45-GoogleVideoDemo.py  # Labs, numbered in learning order
+│   ├── AgentSkills/                                # Skills used by lab 41
+│   └── media/                                      # Created for lab media and generated images
 ├── media/                                          # Course image and sample PDF
 ├── .env.example                                    # Environment variable template (copy to .env)
 ├── requirements.txt                                # Pinned Python dependencies
@@ -231,32 +256,6 @@ MAF-Python/
 ```
 
 Labs follow the naming convention `NN-ShortDescription.py`. To get the most out of the course, work through them in order.
-
----
-
-## Roadmap
-
-Many more labs are planned. Upcoming topics include:
-
-- Long-term memory
-- Human-in-the-loop tool approvals
-- Agent and chat middleware, guardrails, and content safety
-- More workflow patterns: conditional and looping executors
-- More multi-agent orchestration, including magentic patterns
-- Hosting your own MCP server and exposing agents as MCP tools
-- Agent-to-Agent (A2A) protocol
-- Evaluating agents
-- Declarative (YAML) agents
-- Deploying agents to Microsoft Foundry and Azure
-
-When new labs are published, pull the latest changes and reinstall dependencies in case `requirements.txt` changed:
-
-```bash
-git pull
-pip install -r requirements.txt
-```
-
-New labs might also add variables to `.env.example`. Compare it with your `.env` after each update.
 
 ---
 
@@ -270,16 +269,19 @@ New labs might also add variables to `.env.example`. Compare it with your `.env`
 | Lab 07 credential error | Run `az login` and make sure your account has access to the Foundry project. |
 | Lab 08 connection refused | Start Ollama and pull the model: `ollama pull gemma4`. |
 | Hosted tools (labs 14, 15, and 17) fail | Use a model and region that support the Responses API with Code Interpreter or Web Search. |
-| Labs 18–40 `DeploymentNotFound` | If the deployment name is set in the script (for example `gpt-5` or `text-embedding-3-small`), change `model=` to match your deployment. |
+| Labs 18–43 `DeploymentNotFound` | If the deployment name is set in the script (for example `gpt-5` or `model-router`), change `model=` to match your deployment. |
 | Labs 21 and 22 return no results | Run lab 20 first and import the data into the same index named in `AZURE_SEARCH_INDEX_NAME`. |
-| Lab 20 `ModuleNotFoundError: msvcrt` | Lab 20 uses `msvcrt` for single-key input, which is Windows-only. On macOS or Linux, replace `msvcrt.getwch()` with `input()`. |
+| Labs 20 or 21 `ModuleNotFoundError: msvcrt` | Both import the Windows-only `msvcrt` module. On macOS or Linux, replace lab 20's `msvcrt.getwch()` with `input()` and remove the imports. |
 | Lab 26 image generation fails | Set the `x-ms-oai-image-generation-deployment` header and `model` to your image generation deployment name. |
 | Lab 27 PDF input fails on Azure OpenAI | PDF input in this lab uses OpenAI directly. Set `OPENAI_API_KEY`. |
-| Lab 27 PDF file not found | Copy `media/englishdriverhandbook.pdf` to `src/media/englishdriverhandbook.pdf`, or change the path in the script. |
+| Lab 27 PDF file not found | Create `src/media` if needed, then copy `media/englishdriverhandbook.pdf` to `src/media/englishdriverhandbook.pdf`, or change the path in the script. |
 | Lab 30 cannot find the cache container or query vectors | Check `COSMOS_DATABASE_NAME` and `COSMOS_CACHE_CONTAINER_NAME`, and configure the container for vector search and partition key `/pk`. |
 | Lab 32 cannot connect | Start lab 31 first and check that `localhost:5000` is available. |
 | Lab 33 receives an Azure OpenAI 401 | Check `AZURE_OPENAI_API_KEY` and `AZURE_OPENAI_ENDPOINT`; the key must belong to that resource. Restart the demo after changing `.env`. |
 | Lab 34 fails on `.strip()` | Set `APPLICATION_INSIGHTS_INSTRUMENTATION_KEY` to a connection string or an empty value in `.env`. |
+| Lab 41 cannot find skills | Run it from the `src` directory so `AgentSkills` resolves correctly. |
+| Lab 42 cannot authenticate or access its model | Sign in to the Copilot CLI, verify your account has access, and change the configured model if needed. |
+| Lab 44 or 45 reports model or API access errors | Verify the Google API key, account access, and availability of the model named in the script. |
 | PowerShell blocks `Activate.ps1` | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. |
 
 ---

@@ -8,3 +8,7 @@ agent-framework-devui==1.0.0b261106
 agent-framework-orchestrations==1.4.2
 opentelemetry-sdk==1.45.2
 azure-monitor-opentelemetry-exporter==1.0.0b59
+agent-framework-github-copilot==2.1.2
+agent-framework-gemini==1.0.0b261106
+google-genai==3.2.0
+httpx

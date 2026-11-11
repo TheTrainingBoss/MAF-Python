@@ -6,7 +6,7 @@ Welcome to **Mastering Microsoft Agent Framework in Python**, a hands-on, lab-dr
 
 This repo is intended to accompany the full online video course with full demonstrations on the [Training Boss website](https://thetrainingboss.com/course/microsoft-agent-framework-fundamentals-in-python/) 
 
-The labs build on each other: you start by connecting to a model, then add streaming, tools, RAG, multimodal content, persistent history, AG-UI, and observability. Most are standalone Python scripts; the AG-UI client and server labs are designed to run together.
+The labs build on each other: you start by connecting to a model, then add streaming, tools, RAG, multimodal content, persistent history, AG-UI, observability, and workflows. Most are standalone Python scripts; the AG-UI client and server labs are designed to run together.
 
 > 📚 **This course keeps growing.** New labs are added regularly. Watch or star the repository so you get notified when new labs are published.
 
@@ -34,6 +34,8 @@ By the end of the course you will be able to:
 - **Persist and compact conversation history** with Azure Cosmos DB, and explore a vector-based semantic cache.
 - **Connect an AG-UI client and server**, including server and client tools, and explore agents and workflows in DevUI.
 - **Trace agent runs** with OpenTelemetry, console output, and optional Azure Application Insights export.
+- **Build workflows** with custom executors, sequential and concurrent agents, handoffs, and round-robin group chat.
+- **Pause and resume workflows for human input** in an interactive animal-guessing game.
 - In upcoming labs, you'll also work with additional workflow and multi-agent patterns, evaluation, and deployment. See [Roadmap](#roadmap).
 
 ---
@@ -76,7 +78,13 @@ By the end of the course you will be able to:
 | 32 | [32-AGUIClientDemo.py](./src/32-AGUIClientDemo.py) | Streaming AG-UI client with a client-side console color tool | Lab 31 server running locally |
 | 33 | [33-DevUIDemo.py](./src/33-DevUIDemo.py) | Explore agents and sequential and concurrent workflows in DevUI | Azure OpenAI + browser |
 | 34 | [34-OpenTelemetryDemo.py](./src/34-OpenTelemetryDemo.py) | Trace agent runs to the console and optionally Azure Monitor | Azure OpenAI; Application Insights optional |
-| 35+ | *Coming soon* | See [Roadmap](#roadmap) | |
+| 35 | [35-WorkflowWithoutAI.py](./src/35-WorkflowWithoutAI.py) | Connect custom executors to uppercase and reverse text | No model provider required |
+| 36 | [36-SequentialWorkflowDemo.py](./src/36-SequentialWorkflowDemo.py) | Sequential agents summarize text and translate the summary into French | Azure OpenAI (`gpt-5`) |
+| 37 | [37-ConcurrentWorkflowDemo.py](./src/37-ConcurrentWorkflowDemo.py) | Concurrent agents review legal text and spelling | Azure OpenAI (`gpt-5`) |
+| 38 | [38-HandoffWorkflowDemo.py](./src/38-HandoffWorkflowDemo.py) | Supervisor hands questions to movie or music specialists | Azure OpenAI (`gpt-5`, `gpt-5-mini`) |
+| 39 | [39-GroupChatWorkflowDemo.py](./src/39-GroupChatWorkflowDemo.py) | Movie and music agents take turns in a round-robin group chat | Azure OpenAI (`gpt-5`) |
+| 40 | [40-HumanInTheLoopWorkflowDemo.py](./src/40-HumanInTheLoopWorkflowDemo.py) | Pause and resume an animal-guessing workflow for user input | Azure OpenAI (`gpt-5`) |
+| 41+ | *Coming soon* | See [Roadmap](#roadmap) | |
 
 ---
 
@@ -156,7 +164,7 @@ cp .env.example .env
 | Variable | Used by |
 |----------|---------|
 | `OPENAI_API_KEY`, `OPENAI_MODEL` | Labs 01, 25, 27 |
-| `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` | Labs 02, 10–24, 26, 28–31, 33, 34 |
+| `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` | Labs 02, 10–24, 26, 28–31, 33, 34, 36–40 |
 | `AZURE_OPENAI_MODEL` | Lab 02 and other labs that read the model from the environment |
 | `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_API_KEY`, `AZURE_SEARCH_INDEX_NAME` | Labs 21, 22 |
 | `COSMOS_ENDPOINT`, `COSMOS_API_KEY` | Labs 29, 30 |
@@ -192,7 +200,7 @@ Run a lab from the repository root with your virtual environment active:
 python src/01-OpenAIDemo.py
 ```
 
-To exit the interactive labs (11, 12, and 13), type `exit` or `quit`. Labs 21, 22, and 32 keep asking questions in a loop; press `Ctrl+C` to stop them.
+To exit the interactive labs (11, 12, and 13), type `exit` or `quit`. Labs 21, 22, 32, 38, and 39 keep asking questions in a loop; press `Ctrl+C` to stop them. Lab 40 prompts for animal guesses until you guess correctly.
 
 Run the RAG labs in order: lab 20 loads the knowledge base into Azure AI Search (press `Y` when asked to import data), and labs 21 and 22 search it. **Importing deletes and recreates the selected index**, so use a dedicated lab index.
 
@@ -214,7 +222,7 @@ Lab 34 enables sensitive telemetry, which can include prompts and responses. Use
 ```text
 MAF-Python/
 ├── src/
-│   ├── 01-OpenAIDemo.py … 34-OpenTelemetryDemo.py  # Labs, numbered in learning order
+│   ├── 01-OpenAIDemo.py … 40-HumanInTheLoopWorkflowDemo.py  # Labs, numbered in learning order
 │   └── media/                                      # Lab media and generated images
 ├── media/                                          # Course image and sample PDF
 ├── .env.example                                    # Environment variable template (copy to .env)
@@ -234,7 +242,7 @@ Many more labs are planned. Upcoming topics include:
 - Human-in-the-loop tool approvals
 - Agent and chat middleware, guardrails, and content safety
 - More workflow patterns: conditional and looping executors
-- Multi-agent orchestration: handoff, group chat, and magentic patterns
+- More multi-agent orchestration, including magentic patterns
 - Hosting your own MCP server and exposing agents as MCP tools
 - Agent-to-Agent (A2A) protocol
 - Evaluating agents
@@ -262,7 +270,7 @@ New labs might also add variables to `.env.example`. Compare it with your `.env`
 | Lab 07 credential error | Run `az login` and make sure your account has access to the Foundry project. |
 | Lab 08 connection refused | Start Ollama and pull the model: `ollama pull gemma4`. |
 | Hosted tools (labs 14, 15, and 17) fail | Use a model and region that support the Responses API with Code Interpreter or Web Search. |
-| Labs 18–34 `DeploymentNotFound` | If the deployment name is set in the script (for example `gpt-5` or `text-embedding-3-small`), change `model=` to match your deployment. |
+| Labs 18–40 `DeploymentNotFound` | If the deployment name is set in the script (for example `gpt-5` or `text-embedding-3-small`), change `model=` to match your deployment. |
 | Labs 21 and 22 return no results | Run lab 20 first and import the data into the same index named in `AZURE_SEARCH_INDEX_NAME`. |
 | Lab 20 `ModuleNotFoundError: msvcrt` | Lab 20 uses `msvcrt` for single-key input, which is Windows-only. On macOS or Linux, replace `msvcrt.getwch()` with `input()`. |
 | Lab 26 image generation fails | Set the `x-ms-oai-image-generation-deployment` header and `model` to your image generation deployment name. |

@@ -6,7 +6,7 @@ Welcome to **Mastering Microsoft Agent Framework in Python**, a hands-on, lab-dr
 
 This repo is intended to accompany the full online video course with full demonstrations on the [Training Boss website](https://thetrainingboss.com/course/microsoft-agent-framework-fundamentals-in-python/) 
 
-Every lab is a small, self-contained Python script that you can read in a few minutes and run on its own. The labs build on each other: you start by connecting to a model, then add streaming, chat loops, tools, MCP servers, middleware, and multi-agent patterns.
+Every lab is a small, self-contained Python script that you can read in a few minutes and run on its own. The labs build on each other: you start by connecting to a model, then add streaming, chat loops, tools, MCP servers, middleware, structured output, embeddings and RAG, multimodal input and output, and context providers.
 
 > 📚 **This course keeps growing.** New labs are added regularly. Watch or star the repository so you get notified when new labs are published.
 
@@ -25,7 +25,13 @@ By the end of the course you will be able to:
 - **Download files** that the Code Interpreter generates, such as charts.
 - **Intercept and control execution** with function middleware for logging, auditing, and guardrails.
 - **Compose agents** by exposing one agent as a tool of another (agent-as-a-tool).
-- In upcoming labs, you'll also work with memory and threads, workflows, multi-agent orchestration, observability, evaluation, and deployment. See [Roadmap](#roadmap).
+- **Get typed, structured output** from an agent with Pydantic models and `response_format`.
+- **Generate embeddings** and measure semantic similarity with cosine similarity.
+- **Store and search vectors** in Azure AI Search with `AzureAISearchStore` and `@vectorstoremodel`.
+- **Build Retrieval-Augmented Generation (RAG)**, first by injecting search results into the prompt, then agentically by giving the agent a search tool.
+- **Work with multimodal content:** send images and PDFs to a model, and generate images with the hosted image generation tool.
+- **Enrich every run** with a custom `ContextProvider` that injects instructions and tools before the LLM call and processes the result after it.
+- In upcoming labs, you'll also work with memory, workflows, multi-agent orchestration, observability, evaluation, and deployment. See [Roadmap](#roadmap).
 
 ---
 
@@ -50,7 +56,18 @@ By the end of the course you will be able to:
 | 15 | [15-WebSearchTool.py](./15-WebSearchTool.py) | Hosted Web Search tool combined with a local tool | Azure OpenAI (Responses API) |
 | 16 | [16-MCPTool.py](./16-MCPTool.py) | Remote MCP server (Microsoft Learn) with `MCPStreamableHTTPTool` | Azure OpenAI + internet |
 | 17 | [17-AgentMiddleware.py](./17-AgentMiddleware.py) | Function middleware and agent-as-a-tool | Azure OpenAI (Responses API) |
-| 18+ | *Coming soon* | See [Roadmap](#roadmap) | |
+| 18 | [18-StructuredOutput.py](./18-StructuredOutput.py) | Structured output with Pydantic models and `response_format` | Azure OpenAI (`gpt-5`, `gpt-5-mini`) |
+| 19 | [19-EmbeddingDemo.py](./19-EmbeddingDemo.py) | Embeddings with `OpenAIEmbeddingClient` and cosine similarity | Azure OpenAI (`text-embedding-3-small`) |
+| 20 | [20-VectorStoreDemo.py](./20-VectorStoreDemo.py) | Loading a knowledge base into a vector store with `AzureAISearchStore` | Azure OpenAI + Azure AI Search |
+| 21 | [21-SemanticSearchDemo.py](./21-SemanticSearchDemo.py) | Semantic search, then answering with the results in the prompt (RAG) | Azure OpenAI + Azure AI Search |
+| 22 | [22-AgenticRAGDemo.py](./22-AgenticRAGDemo.py) | Agentic RAG: the agent calls a vector search tool when it needs to | Azure OpenAI + Azure AI Search |
+| 23 | [23-ReasoningEffortDemo.py](./23-ReasoningEffortDemo.py) | Comparing reasoning effort levels and their token usage | Azure OpenAI |
+| 24 | [24-ModelImageDemo.py](./24-ModelImageDemo.py) | Sending an image to a model for analysis (base64 data URI or URL) | Azure OpenAI |
+| 25 | [25-ImageGeneration-OpenAI.py](./25-ImageGeneration-OpenAI.py) | Hosted image generation tool, saving the generated image | OpenAI API key (`gpt-image-2`) |
+| 26 | [26-ImageGeneration-AzureOpenAI.py](./26-ImageGeneration-AzureOpenAI.py) | Hosted image generation on Azure OpenAI | Azure OpenAI + image generation deployment |
+| 27 | [27-ModelPDFDemo.py](./27-ModelPDFDemo.py) | Asking questions about a PDF document | OpenAI API key |
+| 28 | [28-AIContextProviderDemo.py](./28-AIContextProviderDemo.py) | Custom `ContextProvider` with `before_run` and `after_run` hooks | Azure OpenAI |
+| 29+ | *Coming soon* | See [Roadmap](#roadmap) | |
 
 ---
 
@@ -67,6 +84,8 @@ By the end of the course you will be able to:
   - [xAI](https://console.x.ai/) API key
   - [Mistral](https://console.mistral.ai/) API key
   - [Microsoft Foundry](https://ai.azure.com/) project and the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
+- **For the embedding and RAG labs (19–22):** a `text-embedding-3-small` deployment in Azure OpenAI and an [Azure AI Search](https://learn.microsoft.com/azure/search/) service.
+- **For the Azure image generation lab (26):** an image generation model deployment (for example `gpt-image-2.5-flare`) in Azure OpenAI.
 - **For the local labs (optional):**
   - [Ollama](https://ollama.com/download) with a pulled model (`ollama pull gemma4`)
   - [Foundry Local](https://learn.microsoft.com/azure/ai-foundry/foundry-local/)
@@ -129,8 +148,9 @@ cp .env.example .env
 
 | Variable | Used by |
 |----------|---------|
-| `OPENAI_API_KEY`, `OPENAI_MODEL` | Lab 01 |
-| `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_MODEL` | Labs 02, 10–17 |
+| `OPENAI_API_KEY`, `OPENAI_MODEL` | Labs 01, 25, 27 |
+| `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_MODEL` | Labs 02, 10–24, 26, 28 |
+| `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_API_KEY`, `AZURE_SEARCH_INDEX_NAME` | Labs 21, 22 |
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Lab 03 |
 | `GOOGLE_API_KEY`, `GOOGLE_MODEL` | Lab 04 |
 | `GROK4_API_KEY`, `GROK4_MODEL`, `GROK4_BASE_URL` | Lab 05 |
@@ -138,6 +158,10 @@ cp .env.example .env
 | `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_MODEL` | Lab 07 |
 
 > ⚠️ **Never commit your `.env` file.** It's already listed in `.gitignore`. Only `.env.example` is tracked.
+
+Some labs from 18 onward use deployment names directly in the code (for example `gpt-5`, `gpt-5-mini`, `text-embedding-3-small`, and `gpt-image-2.5-flare`). If your Azure OpenAI deployments have different names, update the `model=` values in the script.
+
+Lab 20 has placeholders for the Azure AI Search endpoint, key, and index name. Replace them before you run it, and use the same index name as `AZURE_SEARCH_INDEX_NAME` so labs 21 and 22 can search the data that lab 20 loads.
 
 For lab 07 (Microsoft Foundry), sign in to Azure so `AzureCliCredential` can get a token:
 
@@ -153,7 +177,9 @@ Each lab is a standalone script. Run it from the repository root with your virtu
 python 01-OpenAIDemo.py
 ```
 
-To exit the interactive labs (11, 12, and 13), type `exit` or `quit`.
+To exit the interactive labs (11, 12, and 13), type `exit` or `quit`. Labs 21 and 22 keep asking questions in a loop; press `Ctrl+C` to stop them.
+
+Run the RAG labs in order: lab 20 loads the knowledge base into Azure AI Search (press `Y` when asked to import data), and labs 21 and 22 search it.
 
 ---
 
@@ -161,9 +187,10 @@ To exit the interactive labs (11, 12, and 13), type `exit` or `quit`.
 
 ```text
 MAF-Python/
-├── 01-OpenAIDemo.py … 17-AgentMiddleware.py   # Labs, numbered in learning order
-├── .env.example                               # Environment variable template (copy to .env)
-├── requirements.txt                           # Pinned Python dependencies
+├── 01-OpenAIDemo.py … 28-AIContextProviderDemo.py   # Labs, numbered in learning order
+├── media/                                           # Course images, sample PDF, and generated images
+├── .env.example                                     # Environment variable template (copy to .env)
+├── requirements.txt                                 # Pinned Python dependencies
 └── README.md
 ```
 
@@ -173,18 +200,15 @@ Labs follow the naming convention `NN-ShortDescription.py`. To get the most out 
 
 ## Roadmap
 
-At least **25 more labs** are planned. Upcoming topics include:
+Many more labs are planned. Upcoming topics include:
 
-- Conversation threads, sessions, and persistent memory
-- Context providers and Retrieval-Augmented Generation (RAG)
-- Structured output with Pydantic models
+- Persistent sessions and long-term memory
 - Human-in-the-loop tool approvals
 - Agent and chat middleware, guardrails, and content safety
 - Workflows: sequential, concurrent, conditional, and looping executors
 - Multi-agent orchestration: handoff, group chat, and magentic patterns
 - Hosting your own MCP server and exposing agents as MCP tools
 - Agent-to-Agent (A2A) protocol
-- Multimodal agents (images and files)
 - Observability with OpenTelemetry and Azure Monitor
 - Evaluating agents
 - Declarative (YAML) agents
@@ -211,6 +235,11 @@ New labs might also add variables to `.env.example`. Compare it with your `.env`
 | Lab 07 credential error | Run `az login` and make sure your account has access to the Foundry project. |
 | Lab 08 connection refused | Start Ollama and pull the model: `ollama pull gemma4`. |
 | Hosted tools (labs 14, 15, and 17) fail | Use a model and region that support the Responses API with Code Interpreter or Web Search. |
+| Labs 18–28 `DeploymentNotFound` | The deployment name is set in the script (for example `gpt-5` or `text-embedding-3-small`). Change `model=` to match your deployment. |
+| Labs 21 and 22 return no results | Run lab 20 first and import the data into the same index named in `AZURE_SEARCH_INDEX_NAME`. |
+| Lab 20 `ModuleNotFoundError: msvcrt` | Lab 20 uses `msvcrt` for single-key input, which is Windows-only. On macOS or Linux, replace `msvcrt.getwch()` with `input()`. |
+| Lab 26 image generation fails | Set the `x-ms-oai-image-generation-deployment` header and `model` to your image generation deployment name. |
+| Lab 27 PDF input fails on Azure OpenAI | PDF input in this lab uses OpenAI directly. Set `OPENAI_API_KEY`. |
 | PowerShell blocks `Activate.ps1` | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. |
 
 ---

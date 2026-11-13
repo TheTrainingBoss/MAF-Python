@@ -94,7 +94,7 @@ By the end of the course you will be able to:
 
 ## Prerequisites
 
-- **Python 3.11 or later.** Python 3.12+ is recommended.
+- **Python 3.11 or later.** Python 3.13 or 3.14 are recommended.  Do not install 3.15 due to current conflicts between packages in preview.
 - **Git.**
 - **An editor.** [Visual Studio Code](https://code.visualstudio.com/) with the Python extension is recommended.
 - **At least one model provider.** You don't need every provider. Most labs from 10 onward use **Azure OpenAI**, so that's the best one to set up first.

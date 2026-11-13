@@ -47,7 +47,9 @@ async def main():
                 file_content = await raw_openai.containers.files.content.retrieve(
                     file_id, container_id=container_id
                 )
-                path = Path.cwd() / Path(filename).name
+                media_dir = Path(__file__).parent / "media"
+                media_dir.mkdir(parents=True, exist_ok=True)
+                path = media_dir / Path(filename).name
                 path.write_bytes(file_content.content)
  
                 print(f"Attempting to open: '{path}'")

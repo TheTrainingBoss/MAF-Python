@@ -23,7 +23,7 @@ async def main():
             tools=[client.get_web_search_tool(), get_date_time],
         )
 
-    response = await agent.run("What is the score between the 49ers and Rams football game played in Australia in September 2026?")
+    response = await agent.run("What is the score between the 49ers and the Raiders football game played in Santa Clara in November 2026?")
     print(response)
 
     usage = response.usage_details

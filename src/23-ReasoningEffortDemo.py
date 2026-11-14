@@ -10,7 +10,7 @@ load_dotenv()
 endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
 apikey = os.getenv('AZURE_OPENAI_API_KEY')
 
-QUESTION = "Who is Bill Gates? and where was he born?"
+QUESTION = "Who is Elon Musk? and where was he born?"
 
 
 openai_client = AsyncOpenAI(
@@ -50,6 +50,9 @@ async def main() -> None:
     print_usage(response, "medium (default)")
 
     # Let's take control of the reasonning efforts
+    # OpenAI accepts these values for reasoning_effort:
+    # "none", "minimal", "low", "medium", "high", "xhigh", "max"
+    # gpt-5 does not support "xhigh" or "max" reasoning efforts, only newer models do
     reasoning_effort = "high"
     agent_with_reasoning_effort = Agent(
         client=create_client(),

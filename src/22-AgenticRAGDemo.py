@@ -7,7 +7,7 @@ from azure.core.credentials import AzureKeyCredential
 import asyncio
 import os
 from openai import AsyncOpenAI
-from typing import Annotated, Any
+from typing import Annotated, Any, override
 
 @vectorstoremodel
 @dataclass
@@ -50,7 +50,7 @@ class SearchTool:
         return "".join(f"{item}\n" for item in most_similar_knowledge)
 
 async def main():
-    load_dotenv()
+    load_dotenv(override=True)
 
     client = AsyncOpenAI(
         api_key=os.getenv('AZURE_OPENAI_API_KEY'),

@@ -12,6 +12,7 @@ openaiapikey = os.getenv("OPENAI_API_KEY")
 
 client = OpenAIChatClient(model="gpt-5", api_key=openaiapikey)
 
+# Use gpt-image-2.6-flare for image generation instead of gpt-image-2 starting Feb 10th 2027
 agent = Agent(
     client=client,
     tools=[

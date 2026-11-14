@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 async def main():
     load_dotenv()
 
+    # AsyncOpenAI comes from the openai package. 
+    # It's the OpenAI SDK's low-level async HTTP client.
     client = AsyncOpenAI(
         api_key=os.getenv('AZURE_OPENAI_API_KEY'),
         base_url=os.getenv('AZURE_OPENAI_ENDPOINT') + "/openai/v1/",
@@ -25,8 +27,8 @@ async def main():
         client=OpenAIChatClient(model="gpt-5-mini", async_client=client),
         instructions="You are an expert in IMDB Lists",
     )
-
     response1 = await agent1.run(question)
+   
     # This response is not guaranteed to have a structure format; hence the need for this Structured Output feature
     print(response1)  
 

@@ -38,7 +38,7 @@ class KnowledgeBaseVectorRecord:
 
 
 async def main():
-    load_dotenv()
+    load_dotenv(override=True)
 
     client = AsyncOpenAI(
         api_key=os.getenv('AZURE_OPENAI_API_KEY'),

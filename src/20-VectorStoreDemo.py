@@ -9,7 +9,7 @@ from azure.core.credentials import AzureKeyCredential
 import asyncio
 import os
 from openai import AsyncOpenAI
-from typing import Annotated, Any
+from typing import Annotated, Any, override
 from datetime import datetime, timezone
 from collections.abc import Sequence
 import math
@@ -20,7 +20,6 @@ class KnowledgeBaseEntry:
     answer: str
 
 
-# storage_name values match the C# property names so both demos share the same "agindex" schema
 @vectorstoremodel
 @dataclass
 class KnowledgeBaseVectorRecord:
@@ -38,7 +37,7 @@ class KnowledgeBaseVectorRecord:
 
 
 async def main():
-    load_dotenv()
+    load_dotenv(override=True)
 
     client = AsyncOpenAI(
         api_key=os.getenv('AZURE_OPENAI_API_KEY'),
@@ -74,12 +73,12 @@ async def main():
 
     # Using Azure AI Search
     async with AzureAISearchStore(
-        endpoint="https://<enter your Azure Ai Search endpoint>.search.windows.net",  # It is best practice to put this in a secret manager or environment variable
-        credential=AzureKeyCredential("<enter your primary or secondary key>"),  # It is best practice to put this in a secret manager or environment variable
+        endpoint=os.getenv("AZURE_SEARCH_ENDPOINT"),
+        credential=AzureKeyCredential(os.getenv("AZURE_SEARCH_API_KEY")),
         embedding_generator=embedding_generator,
     ) as vector_store_from_azure_ai_search:
         vector_store_collection = vector_store_from_azure_ai_search.get_collection(
-            KnowledgeBaseVectorRecord, collection_name="<enter the name of your collection>"
+            KnowledgeBaseVectorRecord, collection_name=os.getenv("AZURE_SEARCH_INDEX_NAME")
         )
 
         await vector_store_collection.ensure_collection_exists()

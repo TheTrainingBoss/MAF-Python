@@ -1,7 +1,7 @@
 import asyncio
 import os
 import uuid
-from typing import Any
+from typing import Any, override
 
 from agent_framework import Agent
 from agent_framework.openai import OpenAIChatCompletionClient, OpenAIEmbeddingClient
@@ -9,8 +9,7 @@ from azure.cosmos.aio import ContainerProxy, CosmosClient
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
-# Equivalent of the .NET user secrets: reads these values from env vars or a .env file
-load_dotenv()
+load_dotenv(override=True)
 endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 apikey = os.getenv("AZURE_OPENAI_API_KEY")
 cosmosEndpoint = os.getenv("COSMOS_ENDPOINT")

@@ -38,7 +38,6 @@ music_connesseur = Agent(
 )
 
 
-# RoundRobinGroupChatManager: participants take turns in order.
 # You could implement your own selection logic to achieve different group chat behaviors
 # (e.g. priority-based turn taking, dynamic turn taking based on message content, etc.)
 def round_robin_selector(state: GroupChatState) -> str:
@@ -52,6 +51,8 @@ def build_workflow() -> Workflow:
         name="Art Round Robin Workflow",
         participants=[movie_connesseur, music_connesseur],
         selection_func=round_robin_selector,
+        # orchestrator_agent=movie_connesseur,  # Second option instead of selection_func
+        # orchestrator=..., # 3rd option inherit from BaseGroupChatOrchestrator for full control over the conversation loop
         max_rounds=3, 
         # Stream each agent's response as it is generated; the full transcript is the final output
         intermediate_output_from=[movie_connesseur, music_connesseur],

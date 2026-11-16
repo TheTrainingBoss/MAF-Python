@@ -62,7 +62,7 @@ class EvaluateAndHintExecutor(Executor):
     async def handle(self, original_request: FeedbackToUser, message: str, ctx: WorkflowContext[Never, str]) -> None:
         self._number_of_tries += 1
         prompt = (
-            f"Is this the right answer for guessing the animal is '{self._animal_to_guess}'? "
+            f"Is this the right answer for guessing the animal '{self._animal_to_guess}'? "
             f"(allow for spelling errors of the animal): {message}"
         )
         is_right_answer_response = await self._agent.run(prompt, options={"response_format": IsRightAnswer})

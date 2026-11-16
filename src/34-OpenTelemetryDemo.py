@@ -12,7 +12,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 from opentelemetry.trace import set_tracer_provider
 
-load_dotenv()
+load_dotenv(override=True)
 endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 apikey = os.getenv("AZURE_OPENAI_API_KEY")
 appinsightsConnectionString = os.getenv("APPLICATION_INSIGHTS_INSTRUMENTATION_KEY")
@@ -48,9 +48,12 @@ openai_client = AsyncOpenAI(
 agent = Agent(
     client=OpenAIChatCompletionClient(model="gpt-5", async_client=openai_client),
     name="MyLogAnalyticsAgent",
-    instructions="You are a knowledgeable assistant that helps answer questions. Always try to be helpful, precise and concise in your answers. If you don't know the answer, say you don't know instead of trying to make something up.",
-)
-
+    instructions="""
+                    You are a knowledgeable assistant that helps answer questions. Always try to be helpful, 
+                    precise and concise in your answers. If you don't know the answer, say you don't know instead 
+                    of trying to make something up.
+                 """,
+    )
 
 async def main() -> None:
     session = agent.create_session()
